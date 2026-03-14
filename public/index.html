@@ -30,6 +30,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text)
 .login-field input::placeholder { color:rgba(255,255,255,0.25); }
 .login-btn { width:100%; background:linear-gradient(135deg,var(--teal),var(--teal-light)); border:none; border-radius:12px; padding:14px; color:white; font-family:'Tajawal',sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px; transition:transform 0.15s,opacity 0.15s; }
 .login-btn:hover { transform:translateY(-1px); opacity:0.92; }
+.login-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
 .login-error { color:var(--danger); font-size:12px; text-align:center; margin-top:12px; min-height:18px; }
 .sidebar { width:240px; min-height:100vh; background:var(--dark2); display:flex; flex-direction:column; position:fixed; right:0; top:0; bottom:0; z-index:100; }
 .sidebar-logo { padding:28px 24px 20px; border-bottom:1px solid rgba(255,255,255,0.07); }
@@ -68,7 +69,7 @@ nav { padding:16px 12px; flex:1; }
 .stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
 .stat-num { font-family:'DM Mono',monospace; font-size:28px; font-weight:500; color:var(--dark2); line-height:1; }
 .stat-label { font-size:12px; color:var(--muted); margin-top:4px; }
-.stat-change { font-size:11px; font-weight:600; margin-top:8px; display:flex; align-items:center; gap:4px; }
+.stat-change { font-size:11px; font-weight:600; margin-top:8px; }
 .up { color:var(--success); }
 .charts-row { display:grid; grid-template-columns:1.6fr 1fr; gap:16px; margin-bottom:28px; }
 .chart-card { background:white; border-radius:16px; padding:22px; box-shadow:var(--card-shadow); border:1px solid var(--border); }
@@ -142,13 +143,10 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
 .price-val { font-family:'DM Mono',monospace; font-size:22px; font-weight:500; color:var(--dark2); }
 .price-period { font-size:11px; color:var(--muted); margin-top:2px; }
 .price-save { font-size:10px; font-weight:700; color:var(--teal); background:var(--teal-xlight); padding:2px 6px; border-radius:4px; margin-top:4px; display:inline-block; }
-.connect-section { background:white; border-radius:16px; padding:24px; box-shadow:var(--card-shadow); border:1px solid var(--border); margin-bottom:16px; }
-.connect-title { font-size:15px; font-weight:700; color:var(--dark2); margin-bottom:6px; }
-.connect-desc { font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.7; }
-.code-block { background:var(--dark2); border-radius:10px; padding:16px; font-family:'DM Mono',monospace; font-size:12px; color:#14B8A6; line-height:1.8; overflow-x:auto; }
-.code-block .c { color:rgba(255,255,255,0.35); }
-.step-row { display:flex; align-items:flex-start; gap:12px; margin-bottom:18px; }
-.step-num { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:var(--teal); color:white; font-size:11px; font-weight:700; flex-shrink:0; margin-top:2px; }
+.loading { display:flex; align-items:center; justify-content:center; padding:40px; color:var(--muted); font-size:13px; gap:8px; }
+.spinner { width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--teal); border-radius:50%; animation:spin 0.7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.empty-state { text-align:center; padding:40px; color:var(--muted); font-size:13px; }
 .modal-overlay { position:fixed; inset:0; background:rgba(4,31,28,0.6); z-index:500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.2s; backdrop-filter:blur(4px); }
 .modal-overlay.show { opacity:1; pointer-events:all; }
 .modal { background:white; border-radius:20px; padding:32px; width:480px; max-width:90vw; transform:translateY(20px); transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
@@ -165,6 +163,7 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
 .confirm-icon { width:52px; height:52px; border-radius:50%; background:#FEE2E2; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
 .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--dark2); color:white; padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; z-index:9999; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); display:flex; align-items:center; gap:8px; box-shadow:0 8px 32px rgba(6,46,42,0.3); }
 .toast.show { transform:translateX(-50%) translateY(0); }
+.toast-error { background:#991B1B; }
 .page { display:none; }
 .page.active { display:block; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
@@ -176,9 +175,9 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo"><div class="brand">يُ<span>سر</span></div><p>ADMIN PORTAL · لوحة التحكم</p></div>
-    <div class="login-field"><label>البريد الإلكتروني</label><input type="email" id="login-email" value="admin@school.sa"></div>
-    <div class="login-field"><label>كلمة المرور</label><input type="password" id="login-pass" value="123456"></div>
-    <button class="login-btn" onclick="doLogin()">دخول</button>
+    <div class="login-field"><label>البريد الإلكتروني</label><input type="email" id="login-email" placeholder="admin@yusr.sa"></div>
+    <div class="login-field"><label>كلمة المرور</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">دخول</button>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
@@ -192,13 +191,11 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
     <div class="nav-item" onclick="showPage('subscribers',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>المشتركون</div>
     <div class="nav-item" onclick="showPage('revenue',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>الإيرادات</div>
     <div class="nav-item" onclick="showPage('plans',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>الباقات</div>
-    <div class="nav-label">المطور</div>
-    <div class="nav-item" onclick="showPage('connect',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>ربط الموقع</div>
   </nav>
   <div class="sidebar-footer">
     <div class="admin-badge">
-      <div class="admin-avatar">م</div>
-      <div class="admin-info"><div class="name">مدير المنصة</div><div class="role">system_admin</div></div>
+      <div class="admin-avatar" id="admin-initial">م</div>
+      <div class="admin-info"><div class="name" id="admin-name">مدير المنصة</div><div class="role">system_admin</div></div>
       <button class="logout-btn" onclick="doLogout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
     </div>
   </div>
@@ -217,10 +214,10 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
     <!-- DASHBOARD -->
     <div id="page-dashboard" class="page active">
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon" style="background:#E0FAF5;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stat-num" id="s-total">0</div><div class="stat-label">إجمالي المدارس</div><div class="stat-change up">↑ 4 هذا الشهر</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#D1FAE5;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-num" id="s-active">0</div><div class="stat-label">اشتراكات نشطة</div><div class="stat-change up">↑ 3 هذا الشهر</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#DBEAFE;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-num" id="s-trial">0</div><div class="stat-label">فترة تجريبية</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#FEF3C7;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-num" id="s-rev">0</div><div class="stat-label">إيرادات الشهر (ر.س)</div><div class="stat-change up">↑ 12%</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#E0FAF5;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stat-num" id="s-total">—</div><div class="stat-label">إجمالي المدارس</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#D1FAE5;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-num" id="s-active">—</div><div class="stat-label">اشتراكات نشطة</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#DBEAFE;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-num" id="s-trial">—</div><div class="stat-label">فترة تجريبية</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#FEF3C7;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-num" id="s-rev">—</div><div class="stat-label">إيرادات الشهر (ر.س)</div></div>
       </div>
       <div class="charts-row">
         <div class="chart-card"><div class="card-header"><div><div class="card-title">الاشتراكات الجديدة</div><div class="card-sub">آخر 7 أشهر</div></div></div><div class="bar-chart" id="bar-chart"></div></div>
@@ -230,10 +227,10 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
               <circle cx="60" cy="60" r="45" fill="none" stroke="#F0F8F7" stroke-width="18"/>
               <circle cx="60" cy="60" r="45" fill="none" stroke="#0D9488" stroke-width="18" stroke-dasharray="141 142" stroke-dashoffset="-42" transform="rotate(-90 60 60)"/>
               <circle cx="60" cy="60" r="45" fill="none" stroke="#F5A623" stroke-width="18" stroke-dasharray="141 142" stroke-dashoffset="-183" transform="rotate(-90 60 60)"/>
-              <text x="60" y="56" text-anchor="middle" font-size="16" font-weight="800" font-family="DM Mono" fill="#062E2A" id="donut-num">0</text>
+              <text x="60" y="56" text-anchor="middle" font-size="16" font-weight="800" font-family="DM Mono" fill="#062E2A" id="donut-num">—</text>
               <text x="60" y="70" text-anchor="middle" font-size="9" fill="#6B8F8D" font-family="Tajawal">نشط</text>
             </svg>
-            <div><div class="legend-item"><div class="legend-dot" style="background:#0D9488"></div><div class="legend-label">أساسي</div><div class="legend-val" id="l-basic">0</div></div><div class="legend-item"><div class="legend-dot" style="background:#F5A623"></div><div class="legend-label">احترافي</div><div class="legend-val" id="l-pro">0</div></div></div>
+            <div><div class="legend-item"><div class="legend-dot" style="background:#0D9488"></div><div class="legend-label">أساسي</div><div class="legend-val" id="l-basic">—</div></div><div class="legend-item"><div class="legend-dot" style="background:#F5A623"></div><div class="legend-label">احترافي</div><div class="legend-val" id="l-pro">—</div></div></div>
           </div>
         </div>
       </div>
@@ -251,7 +248,8 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
             <button class="filter-tab" onclick="filterStatus('expired',this)">منتهي</button>
           </div>
         </div>
-        <table>
+        <div id="subscribers-loading" class="loading"><div class="spinner"></div> جاري التحميل...</div>
+        <table id="subscribers-table-wrap" style="display:none;">
           <thead><tr><th>المدرسة</th><th>الباقة</th><th>الدفع</th><th>الحالة</th><th>الانتهاء</th><th>الإيراد/شهر</th><th>إجراءات</th></tr></thead>
           <tbody id="subscribers-table"></tbody>
         </table>
@@ -261,11 +259,11 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
     <!-- REVENUE -->
     <div id="page-revenue" class="page">
       <div class="revenue-grid">
-        <div class="revenue-card"><div class="revenue-month">هذا الشهر</div><div class="revenue-amount" id="rev-month"><span class="revenue-currency">ر.س</span>0</div><div class="stat-change up" style="margin-top:8px;">↑ 12% عن الشهر السابق</div></div>
-        <div class="revenue-card"><div class="revenue-month">متوقع سنوياً</div><div class="revenue-amount" id="rev-year"><span class="revenue-currency">ر.س</span>0</div></div>
-        <div class="revenue-card"><div class="revenue-month">متوسط الاشتراك</div><div class="revenue-amount" id="rev-avg"><span class="revenue-currency">ر.س</span>0</div></div>
+        <div class="revenue-card"><div class="revenue-month">هذا الشهر</div><div class="revenue-amount" id="rev-month"><span class="revenue-currency">ر.س</span>—</div></div>
+        <div class="revenue-card"><div class="revenue-month">متوقع سنوياً</div><div class="revenue-amount" id="rev-year"><span class="revenue-currency">ر.س</span>—</div></div>
+        <div class="revenue-card"><div class="revenue-month">متوسط الاشتراك</div><div class="revenue-amount" id="rev-avg"><span class="revenue-currency">ر.س</span>—</div></div>
       </div>
-      <div class="table-card"><div class="table-toolbar"><div><div class="card-title">سجل المدفوعات</div></div></div><div style="padding:0 22px;"><div id="revenue-timeline"></div></div></div>
+      <div class="table-card"><div class="table-toolbar"><div><div class="card-title">أحدث الاشتراكات</div></div></div><div style="padding:0 22px;"><div id="revenue-timeline"></div></div></div>
     </div>
 
     <!-- PLANS -->
@@ -289,25 +287,6 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
       <div class="table-card"><div class="table-toolbar"><div class="card-title">توزيع المشتركين</div></div><div style="padding:16px 22px;display:flex;gap:16px;" id="plan-dist"></div></div>
     </div>
 
-    <!-- CONNECT -->
-    <div id="page-connect" class="page">
-      <div class="connect-section">
-        <div class="connect-title">كيف تربط لوحة التحكم بموقعك على Railway</div>
-        <div class="connect-desc">اللوحة تتصل بنفس الـ API — نفس قاعدة البيانات، نفس المستخدمين. كل اللي تحتاجه 4 خطوات.</div>
-        <div>
-          <div class="step-row"><span class="step-num">1</span><div><div style="font-size:13px;font-weight:700;color:var(--dark2);margin-bottom:6px;">عدّل رابط الـ API في أعلى الـ script</div><div class="code-block"><span class="c">// غيّر هذا السطر</span><br>const API = '<span style="color:#F5A623;">https://workspaceapi-server-production-51a7.up.railway.app</span>';</div></div></div>
-          <div class="step-row"><span class="step-num">2</span><div><div style="font-size:13px;font-weight:700;color:var(--dark2);margin-bottom:6px;">أضف endpoints للأدمن في api-server</div><div class="code-block">GET    /api/admin/subscriptions<br>PUT    /api/admin/subscriptions/:id<br>DELETE /api/admin/users/:id<br>POST   /api/admin/users</div></div></div>
-          <div class="step-row"><span class="step-num">3</span><div><div style="font-size:13px;font-weight:700;color:var(--dark2);margin-bottom:6px;">أضف حماية للـ endpoints — system_admin فقط</div><div class="code-block"><span class="c">// middleware/adminAuth.ts</span><br>if (req.user.role !== 'system_admin') {<br>&nbsp;&nbsp;return res.status(403).json({ error: 'غير مصرح' });<br>}</div></div></div>
-          <div class="step-row"><span class="step-num">4</span><div><div style="font-size:13px;font-weight:700;color:var(--dark2);margin-bottom:6px;">ارفع لوحة التحكم على Vercel كمشروع منفصل</div><div class="code-block"><span class="c"># ارفع yusr-admin.html على Vercel</span><br><span class="c"># أو حطه في مجلد admin/ في نفس المستودع</span></div></div></div>
-        </div>
-      </div>
-      <div class="connect-section">
-        <div class="connect-title">بيانات الدخول الحالية (تجريبية)</div>
-        <div class="connect-desc">البيانات الحين وهمية للعرض فقط. بعد ربط الـ API تصبح حقيقية من قاعدة بياناتك.</div>
-        <div class="code-block">البريد: admin@school.sa &nbsp;&nbsp; كلمة السر: 123456</div>
-      </div>
-    </div>
-
   </div>
 </main>
 
@@ -316,19 +295,18 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
   <div class="modal">
     <div class="modal-title">إضافة مدرسة جديدة</div>
     <div class="modal-sub">أدخل بيانات المدرسة لإنشاء حساب وتفعيل الاشتراك</div>
-    <div class="modal-field"><label>اسم المدرسة</label><input type="text" id="new-name" placeholder="مدرسة النور الأهلية"></div>
+    <div class="modal-field"><label>اسم المدير</label><input type="text" id="new-name" placeholder="محمد العمري"></div>
     <div class="modal-field"><label>البريد الإلكتروني</label><input type="email" id="new-email" placeholder="admin@school.sa" dir="ltr"></div>
+    <div class="modal-field"><label>كلمة المرور</label><input type="password" id="new-pass" placeholder="••••••••" dir="ltr"></div>
     <div class="modal-field"><label>الباقة</label>
       <select id="new-plan">
-        <option value="basic_monthly">أساسي — 49 ر.س/شهر</option>
-        <option value="basic_yearly">أساسي — 199 ر.س/سنة</option>
-        <option value="pro_monthly">احترافي — 89 ر.س/شهر</option>
-        <option value="pro_yearly">احترافي — 299 ر.س/سنة</option>
+        <option value="basic">أساسي — 49 ر.س/شهر</option>
+        <option value="professional">احترافي — 89 ر.س/شهر</option>
       </select>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('add-modal')">إلغاء</button>
-      <button class="btn btn-primary" onclick="addSchool()">إنشاء الحساب</button>
+      <button class="btn btn-primary" id="add-btn" onclick="addSchool()">إنشاء الحساب</button>
     </div>
   </div>
 </div>
@@ -341,7 +319,7 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
     <div style="font-size:13px;color:var(--muted);margin-bottom:24px;" id="delete-msg">هل أنت متأكد؟</div>
     <div style="display:flex;gap:10px;justify-content:center;">
       <button class="btn btn-ghost" onclick="closeModal('delete-modal')">إلغاء</button>
-      <button class="btn btn-danger" onclick="confirmDelete()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>نعم، احذف</button>
+      <button class="btn btn-danger" id="delete-confirm-btn" onclick="confirmDelete()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>نعم، احذف</button>
     </div>
   </div>
 </div>
@@ -350,112 +328,293 @@ tbody td { padding:13px 18px; font-size:13px; color:var(--text); }
 
 <script>
 const API = 'https://workspaceapi-server-production-51a7.up.railway.app';
-let currentFilter='all',searchTerm='',deleteTarget=null;
-const PLANS={basic_monthly:{label:'أساسي',period:'شهري',price:49,badge:'badge-basic'},basic_yearly:{label:'أساسي',period:'سنوي',price:199,badge:'badge-basic'},pro_monthly:{label:'احترافي',period:'شهري',price:89,badge:'badge-pro'},pro_yearly:{label:'احترافي',period:'سنوي',price:299,badge:'badge-pro'}};
-let schools=[
-  {id:1,name:'مدرسة النور الأهلية',email:'admin@alnoor.sa',plan:'pro_monthly',status:'active',expiry:'2025-12-01'},
-  {id:2,name:'مدرسة الفجر الابتدائية',email:'admin@alfajr.sa',plan:'basic_monthly',status:'active',expiry:'2025-11-15'},
-  {id:3,name:'ثانوية الأمل للبنات',email:'info@alamal.sa',plan:'pro_yearly',status:'active',expiry:'2026-01-20'},
-  {id:4,name:'مدرسة الريادة المتوسطة',email:'admin@alriada.sa',plan:'basic_monthly',status:'trial',expiry:'2025-09-30'},
-  {id:5,name:'مجمع العلوم التعليمي',email:'info@aloloom.sa',plan:'basic_yearly',status:'active',expiry:'2025-10-10'},
-  {id:6,name:'مدرسة الإبداع الدولية',email:'admin@ibdaa.sa',plan:'pro_yearly',status:'active',expiry:'2026-03-15'},
-  {id:7,name:'روضة البراعم',email:'admin@baraem.sa',plan:'basic_monthly',status:'trial',expiry:'2025-09-25'},
-  {id:8,name:'مدرسة الوفاء الخاصة',email:'info@alwafa.sa',plan:'pro_monthly',status:'expired',expiry:'2025-08-01'},
-];
-const payments=[
-  {school:'ثانوية الأمل للبنات',plan:'احترافي سنوي',amount:299,date:'2025-09-01'},
-  {school:'مدرسة النور الأهلية',plan:'احترافي شهري',amount:89,date:'2025-09-01'},
-  {school:'مجمع العلوم التعليمي',plan:'أساسي سنوي',amount:199,date:'2025-09-01'},
-  {school:'مدرسة الفجر الابتدائية',plan:'أساسي شهري',amount:49,date:'2025-09-01'},
-  {school:'مدرسة الإبداع الدولية',plan:'احترافي سنوي',amount:299,date:'2025-08-15'},
-  {school:'ثانوية الأمل للبنات',plan:'احترافي سنوي',amount:299,date:'2025-08-01'},
-  {school:'مدرسة النور الأهلية',plan:'احترافي شهري',amount:89,date:'2025-08-01'},
-  {school:'مجمع العلوم التعليمي',plan:'أساسي سنوي',amount:199,date:'2025-08-01'},
-  {school:'مدرسة الفجر الابتدائية',plan:'أساسي شهري',amount:49,date:'2025-08-01'},
-  {school:'مدرسة الإبداع الدولية',plan:'احترافي سنوي',amount:299,date:'2025-07-20'},
-];
-const barData=[{month:'مار',val:3},{month:'أبر',val:5},{month:'ماي',val:4},{month:'يون',val:7},{month:'يول',val:6},{month:'أغس',val:8},{month:'سبت',val:4}];
+let token = localStorage.getItem('yusr_admin_token');
+let allSubscriptions = [];
+let currentFilter = 'all';
+let searchTerm = '';
+let deleteTarget = null;
 
-function calcRev(s){if(s.status!=='active')return 0;const p=PLANS[s.plan];return p.period==='شهري'?p.price:Math.round(p.price/12);}
+const PLAN_LABELS = { basic:'أساسي', professional:'احترافي', basic_monthly:'أساسي', basic_yearly:'أساسي', pro_monthly:'احترافي', pro_yearly:'احترافي' };
+const PLAN_BADGE  = { basic:'badge-basic', professional:'badge-pro', basic_monthly:'badge-basic', basic_yearly:'badge-basic', pro_monthly:'badge-pro', pro_yearly:'badge-pro' };
+const STATUS_LABELS = { active:'نشط', trial:'تجريبي', expired:'منتهي' };
+const STATUS_BADGE  = { active:'badge-active', trial:'badge-trial', expired:'badge-expired' };
+const PLAN_PRICE  = { basic:49, professional:89, basic_monthly:49, basic_yearly:Math.round(199/12), pro_monthly:89, pro_yearly:Math.round(299/12) };
 
-function updateStats(){
-  const active=schools.filter(s=>s.status==='active');
-  const trial=schools.filter(s=>s.status==='trial');
-  const rev=active.reduce((sum,s)=>sum+calcRev(s),0);
-  const basic=active.filter(s=>s.plan.startsWith('basic')).length;
-  const pro=active.filter(s=>s.plan.startsWith('pro')).length;
-  document.getElementById('s-total').textContent=schools.length;
-  document.getElementById('s-active').textContent=active.length;
-  document.getElementById('s-trial').textContent=trial.length;
-  document.getElementById('s-rev').textContent=rev.toLocaleString();
-  document.getElementById('donut-num').textContent=active.length;
-  document.getElementById('l-basic').textContent=basic;
-  document.getElementById('l-pro').textContent=pro;
-  const rm=document.getElementById('rev-month');if(rm)rm.innerHTML=`<span class="revenue-currency">ر.س</span>${rev.toLocaleString()}`;
-  const ry=document.getElementById('rev-year');if(ry)ry.innerHTML=`<span class="revenue-currency">ر.س</span>${(rev*12).toLocaleString()}`;
-  const ra=document.getElementById('rev-avg');if(ra&&active.length)ra.innerHTML=`<span class="revenue-currency">ر.س</span>${Math.round(rev/active.length)}`;
-  const pd=document.getElementById('plan-dist');
-  if(pd)pd.innerHTML=`<div style="flex:1;background:var(--bg);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:var(--teal);">${basic}</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">أساسي</div></div><div style="flex:1;background:var(--bg);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:#D97706;">${pro}</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">احترافي</div></div><div style="flex:1;background:var(--bg);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:var(--muted);">${trial.length}</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">تجريبي</div></div>`;
+const barData = [{month:'مار',val:3},{month:'أبر',val:5},{month:'ماي',val:4},{month:'يون',val:7},{month:'يول',val:6},{month:'أغس',val:8},{month:'سبت',val:4}];
+
+// ─── API HELPERS ───
+function authHeaders() {
+  return { 'Content-Type':'application/json', 'Authorization':'Bearer '+token };
 }
 
-function renderBars(){const max=Math.max(...barData.map(d=>d.val));document.getElementById('bar-chart').innerHTML=barData.map(d=>`<div class="bar-wrap"><div class="bar" style="height:${(d.val/max)*100}px"></div><div class="bar-label">${d.month}</div></div>`).join('');}
+async function apiFetch(url, options={}) {
+  const res = await fetch(API + url, { ...options, headers: { ...authHeaders(), ...(options.headers||{}) } });
+  if (res.status === 401) { doLogout(); return null; }
+  return res.json();
+}
 
-function renderSubscribers(){
-  const sL={active:'نشط',trial:'تجريبي',expired:'منتهي'};
-  const sB={active:'badge-active',trial:'badge-trial',expired:'badge-expired'};
-  const data=schools.filter(s=>{
-    const mf=currentFilter==='all'||s.status===currentFilter;
-    const ms=!searchTerm||s.name.includes(searchTerm)||s.email.includes(searchTerm);
-    return mf&&ms;
+// ─── LOGIN ───
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  const btn   = document.getElementById('login-btn');
+  if (!email || !pass) { errEl.textContent = 'أدخل البريد وكلمة المرور'; return; }
+  btn.disabled = true; btn.textContent = 'جاري الدخول...';
+  errEl.textContent = '';
+  try {
+    const data = await fetch(API + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify({ email, password: pass })
+    }).then(r => r.json());
+    if (data.token && data.user?.role === 'system_admin') {
+      token = data.token;
+      localStorage.setItem('yusr_admin_token', token);
+      const name = data.user.name || 'مدير المنصة';
+      document.getElementById('admin-name').textContent = name;
+      document.getElementById('admin-initial').textContent = name[0] || 'م';
+      document.getElementById('login-screen').classList.add('hidden');
+      init();
+    } else if (data.token) {
+      errEl.textContent = 'هذا الحساب لا يملك صلاحية الأدمن';
+    } else {
+      errEl.textContent = data.error || 'بيانات الدخول غير صحيحة';
+    }
+  } catch(e) {
+    errEl.textContent = 'تعذر الاتصال بالخادم';
+  } finally {
+    btn.disabled = false; btn.textContent = 'دخول';
+  }
+}
+
+function doLogout() {
+  token = null;
+  localStorage.removeItem('yusr_admin_token');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// ─── FETCH SUBSCRIPTIONS ───
+async function fetchSubscriptions() {
+  document.getElementById('subscribers-loading').style.display = 'flex';
+  document.getElementById('subscribers-table-wrap').style.display = 'none';
+  const data = await apiFetch('/api/admin/subscriptions');
+  if (!data) return;
+  allSubscriptions = Array.isArray(data) ? data : [];
+  document.getElementById('subscribers-loading').style.display = 'none';
+  document.getElementById('subscribers-table-wrap').style.display = 'table';
+  updateStats();
+  renderSubscribers();
+}
+
+// ─── STATS ───
+function updateStats() {
+  const active = allSubscriptions.filter(s => s.status === 'active');
+  const trial  = allSubscriptions.filter(s => s.status === 'trial');
+  const rev    = active.reduce((sum, s) => sum + (PLAN_PRICE[s.plan] || 0), 0);
+  const basic  = active.filter(s => s.plan?.includes('basic')).length;
+  const pro    = active.filter(s => s.plan?.includes('pro') || s.plan?.includes('professional')).length;
+
+  document.getElementById('s-total').textContent  = allSubscriptions.length;
+  document.getElementById('s-active').textContent = active.length;
+  document.getElementById('s-trial').textContent  = trial.length;
+  document.getElementById('s-rev').textContent    = rev.toLocaleString();
+  document.getElementById('donut-num').textContent = active.length;
+  document.getElementById('l-basic').textContent  = basic;
+  document.getElementById('l-pro').textContent    = pro;
+
+  const rm = document.getElementById('rev-month');
+  if (rm) rm.innerHTML = `<span class="revenue-currency">ر.س</span>${rev.toLocaleString()}`;
+  const ry = document.getElementById('rev-year');
+  if (ry) ry.innerHTML = `<span class="revenue-currency">ر.س</span>${(rev*12).toLocaleString()}`;
+  const ra = document.getElementById('rev-avg');
+  if (ra && active.length) ra.innerHTML = `<span class="revenue-currency">ر.س</span>${Math.round(rev/active.length)}`;
+
+  const pd = document.getElementById('plan-dist');
+  if (pd) pd.innerHTML = `
+    <div style="flex:1;background:var(--bg);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:var(--teal);">${basic}</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">أساسي</div></div>
+    <div style="flex:1;background:var(--bg);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:#D97706;">${pro}</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">احترافي</div></div>
+    <div style="flex:1;background:var(--bg);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:var(--muted);">${trial.length}</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">تجريبي</div></div>`;
+}
+
+// ─── RENDER TABLE ───
+function renderSubscribers() {
+  const data = allSubscriptions.filter(s => {
+    const mf = currentFilter === 'all' || s.status === currentFilter;
+    const ms = !searchTerm || (s.schoolName||'').includes(searchTerm) || (s.userEmail||'').includes(searchTerm) || (s.userName||'').includes(searchTerm);
+    return mf && ms;
   });
-  document.getElementById('subscribers-table').innerHTML=data.map(s=>{
-    const p=PLANS[s.plan];const rev=calcRev(s);
-    return`<tr><td><div class="school-cell"><div class="school-avatar">${s.name[0]}</div><div><div class="school-name">${s.name}</div><div class="school-email">${s.email}</div></div></div></td><td><span class="badge ${p.badge}">${p.label}</span></td><td><span style="font-size:12px;color:var(--muted);">${p.period}</span></td><td><span class="badge ${sB[s.status]}">${sL[s.status]}</span></td><td style="font-size:12px;color:var(--muted);">${s.expiry}</td><td><span class="plan-price">${rev>0?rev+' ر.س':'—'}</span></td><td><div class="action-btns">${s.status!=='expired'?`<button class="action-btn btn-toggle-on" onclick="toggleSchool(${s.id},false)" title="إيقاف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="16" cy="12" r="3" fill="currentColor" stroke="none"/></svg></button>`:`<button class="action-btn btn-toggle-off" onclick="toggleSchool(${s.id},true)" title="تفعيل"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="8" cy="12" r="3" fill="currentColor" stroke="none"/></svg></button>`}<button class="action-btn btn-del" onclick="askDelete(${s.id})" title="حذف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></td></tr>`;
+  const tbody = document.getElementById('subscribers-table');
+  if (!data.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">لا توجد نتائج</div></td></tr>`; return; }
+  tbody.innerHTML = data.map(s => {
+    const plan   = PLAN_LABELS[s.plan] || s.plan || '—';
+    const badge  = PLAN_BADGE[s.plan]  || 'badge-basic';
+    const status = STATUS_LABELS[s.status] || s.status;
+    const sbadge = STATUS_BADGE[s.status]  || 'badge-expired';
+    const price  = PLAN_PRICE[s.plan] || 0;
+    const expiry = s.expiresAt ? new Date(s.expiresAt).toLocaleDateString('ar-SA') : '—';
+    const name   = s.schoolName || s.userName || '—';
+    return `<tr>
+      <td><div class="school-cell">
+        <div class="school-avatar">${name[0]||'م'}</div>
+        <div><div class="school-name">${name}</div><div class="school-email">${s.userEmail||'—'}</div></div>
+      </div></td>
+      <td><span class="badge ${badge}">${plan}</span></td>
+      <td><span style="font-size:12px;color:var(--muted);">شهري</span></td>
+      <td><span class="badge ${sbadge}">${status}</span></td>
+      <td style="font-size:12px;color:var(--muted);">${expiry}</td>
+      <td><span class="plan-price">${s.status==='active'?price+' ر.س':'—'}</span></td>
+      <td><div class="action-btns">
+        ${s.status !== 'expired'
+          ? `<button class="action-btn btn-toggle-on" onclick="toggleSub('${s.id}','${s.plan}','${s.expiresAt}',false)" title="إيقاف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="16" cy="12" r="3" fill="currentColor" stroke="none"/></svg></button>`
+          : `<button class="action-btn btn-toggle-off" onclick="toggleSub('${s.id}','${s.plan}','${s.expiresAt}',true)" title="تفعيل"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="8" cy="12" r="3" fill="currentColor" stroke="none"/></svg></button>`}
+        <button class="action-btn btn-del" onclick="askDelete('${s.id}','${name}')" title="حذف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
+      </div></td>
+    </tr>`;
   }).join('');
 }
 
-function renderRevenue(){const tl=document.getElementById('revenue-timeline');if(!tl)return;tl.innerHTML=payments.map(p=>`<div class="timeline-row"><div><div class="timeline-school">${p.school}</div><div class="timeline-plan">${p.plan}</div></div><div style="text-align:left;"><div class="timeline-amount">${p.amount} ر.س</div><div class="timeline-date">${p.date}</div></div></div>`).join('');}
+// ─── TOGGLE SUBSCRIPTION ───
+async function toggleSub(id, plan, expiresAt, activate) {
+  const newStatus = activate ? 'active' : 'expired';
+  const data = await apiFetch('/api/admin/subscriptions/'+id, {
+    method: 'PUT',
+    body: JSON.stringify({ status: newStatus, plan, expiresAt })
+  });
+  if (data?.success) {
+    showToast(activate ? 'تم تفعيل الاشتراك' : 'تم إيقاف الاشتراك');
+    await fetchSubscriptions();
+  } else {
+    showToast('فشل التحديث — ' + (data?.error||''), true);
+  }
+}
 
-function toggleSchool(id,activate){const s=schools.find(x=>x.id===id);if(!s)return;s.status=activate?'active':'expired';updateStats();renderSubscribers();showToast(activate?'تم تفعيل '+s.name:'تم إيقاف '+s.name);}
-function askDelete(id){deleteTarget=id;const s=schools.find(x=>x.id===id);document.getElementById('delete-msg').textContent=`هل أنت متأكد من حذف "${s.name}"؟`;document.getElementById('delete-modal').classList.add('show');}
-function confirmDelete(){if(!deleteTarget)return;const s=schools.find(x=>x.id===deleteTarget);schools=schools.filter(x=>x.id!==deleteTarget);deleteTarget=null;closeModal('delete-modal');updateStats();renderSubscribers();showToast('تم حذف '+s.name);}
-function filterStatus(status,btn){currentFilter=status;document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderSubscribers();}
-function filterTable(val){searchTerm=val;renderSubscribers();}
-function showPage(page,navItem){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+// ─── DELETE ───
+function askDelete(id, name) {
+  deleteTarget = id;
+  document.getElementById('delete-msg').textContent = `هل أنت متأكد من حذف "${name}"؟ لا يمكن التراجع.`;
+  document.getElementById('delete-modal').classList.add('show');
+}
+
+async function confirmDelete() {
+  if (!deleteTarget) return;
+  const btn = document.getElementById('delete-confirm-btn');
+  btn.disabled = true; btn.textContent = 'جاري الحذف...';
+  const data = await apiFetch('/api/admin/users/'+deleteTarget, { method:'DELETE' });
+  btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>نعم، احذف';
+  closeModal('delete-modal');
+  deleteTarget = null;
+  if (data?.success) {
+    showToast('تم حذف المشترك');
+    await fetchSubscriptions();
+  } else {
+    showToast('فشل الحذف — ' + (data?.error||''), true);
+  }
+}
+
+// ─── ADD SCHOOL ───
+async function addSchool() {
+  const name  = document.getElementById('new-name').value.trim();
+  const email = document.getElementById('new-email').value.trim();
+  const pass  = document.getElementById('new-pass').value;
+  const plan  = document.getElementById('new-plan').value;
+  if (!name || !email || !pass) { showToast('أدخل جميع الحقول', true); return; }
+  const btn = document.getElementById('add-btn');
+  btn.disabled = true; btn.textContent = 'جاري الإنشاء...';
+  const data = await apiFetch('/api/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({ name, email, passwordHash: pass, role:'school_admin', plan })
+  });
+  btn.disabled = false; btn.textContent = 'إنشاء الحساب';
+  closeModal('add-modal');
+  if (data?.id) {
+    showToast('تم إنشاء حساب ' + name);
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-email').value = '';
+    document.getElementById('new-pass').value = '';
+    await fetchSubscriptions();
+  } else {
+    showToast('فشل الإنشاء — ' + (data?.error||''), true);
+  }
+}
+
+// ─── REVENUE PAGE ───
+function renderRevenue() {
+  const tl = document.getElementById('revenue-timeline');
+  if (!tl) return;
+  const recent = [...allSubscriptions].sort((a,b) => new Date(b.startedAt||0) - new Date(a.startedAt||0)).slice(0,10);
+  if (!recent.length) { tl.innerHTML = '<div class="empty-state">لا توجد بيانات</div>'; return; }
+  tl.innerHTML = recent.map(s => `
+    <div class="timeline-row">
+      <div><div class="timeline-school">${s.schoolName||s.userName||'—'}</div><div class="timeline-plan">${PLAN_LABELS[s.plan]||s.plan||'—'}</div></div>
+      <div style="text-align:left;"><div class="timeline-amount">${PLAN_PRICE[s.plan]||0} ر.س</div><div class="timeline-date">${s.startedAt?new Date(s.startedAt).toLocaleDateString('ar-SA'):'—'}</div></div>
+    </div>`).join('');
+}
+
+// ─── HELPERS ───
+function filterStatus(status, btn) {
+  currentFilter = status;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderSubscribers();
+}
+
+function filterTable(val) { searchTerm = val; renderSubscribers(); }
+
+function showPage(page, navItem) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   navItem.classList.add('active');
-  const t={dashboard:['لوحة المتابعة','نظرة عامة على المنصة'],subscribers:['المشتركون','إدارة مدارس يُسر'],revenue:['الإيرادات','سجل المدفوعات'],plans:['الباقات','أسعار الاشتراكات'],connect:['ربط الموقع','توصيل لوحة التحكم بالـ API']};
-  document.getElementById('page-title').textContent=t[page][0];
-  document.getElementById('page-sub').textContent=t[page][1];
-  if(page==='revenue')renderRevenue();
-  if(page==='plans')updateStats();
+  const t = {
+    dashboard:   ['لوحة المتابعة','نظرة عامة على المنصة'],
+    subscribers: ['المشتركون','إدارة مدارس يُسر'],
+    revenue:     ['الإيرادات','سجل المدفوعات'],
+    plans:       ['الباقات','أسعار الاشتراكات'],
+  };
+  document.getElementById('page-title').textContent = t[page][0];
+  document.getElementById('page-sub').textContent   = t[page][1];
+  if (page === 'revenue') renderRevenue();
+  if (page === 'plans') updateStats();
 }
-function openAddModal(){document.getElementById('add-modal').classList.add('show');}
-function closeModal(id){document.getElementById(id).classList.remove('show');}
-function addSchool(){
-  const name=document.getElementById('new-name').value.trim();
-  const email=document.getElementById('new-email').value.trim();
-  const plan=document.getElementById('new-plan').value;
-  if(!name||!email){showToast('أدخل الاسم والبريد');return;}
-  const d=new Date();d.setDate(d.getDate()+7);
-  schools.push({id:Date.now(),name,email,plan,status:'trial',expiry:d.toISOString().split('T')[0]});
-  closeModal('add-modal');updateStats();renderSubscribers();showToast('تم إنشاء حساب '+name);
-  document.getElementById('new-name').value='';document.getElementById('new-email').value='';
+
+function openAddModal() { document.getElementById('add-modal').classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.toggle('toast-error', isError);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
-function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
-function refreshData(){updateStats();renderSubscribers();showToast('تم التحديث');}
-function doLogin(){
-  const e=document.getElementById('login-email').value;
-  const p=document.getElementById('login-pass').value;
-  if(e==='admin@school.sa'&&p==='123456'){localStorage.setItem('yusr_admin_token','demo');document.getElementById('login-screen').classList.add('hidden');init();}
-  else{document.getElementById('login-error').textContent='بيانات غير صحيحة';}
+
+function renderBars() {
+  const max = Math.max(...barData.map(d => d.val));
+  document.getElementById('bar-chart').innerHTML = barData.map(d =>
+    `<div class="bar-wrap"><div class="bar" style="height:${(d.val/max)*100}px"></div><div class="bar-label">${d.month}</div></div>`
+  ).join('');
 }
-function doLogout(){localStorage.removeItem('yusr_admin_token');document.getElementById('login-screen').classList.remove('hidden');}
-function init(){renderBars();updateStats();renderSubscribers();}
-if(localStorage.getItem('yusr_admin_token')){document.getElementById('login-screen').classList.add('hidden');init();}
-document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+async function refreshData() {
+  showToast('جاري التحديث...');
+  await fetchSubscriptions();
+}
+
+async function init() {
+  renderBars();
+  await fetchSubscriptions();
+}
+
+// ─── AUTO LOGIN ───
+if (token) {
+  document.getElementById('login-screen').classList.add('hidden');
+  init();
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 </script>
 </body>
 </html>
